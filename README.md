@@ -4,7 +4,7 @@ This repository presents my notes in Bayesian modelling, causal discovery and ca
 
 ## Reading Group
 
-Study notes on the Structure Learning reading group at the Human Institute of Technology (HTI), University of Technology of Sydney.
+Study notes on the Structure Learning reading group at the Human Institute of Technology (HTI), University of Technology Sydney.
 
 ### July 2023
   - [[Castelletti and Peluso, 2022] Network Structure Learning Under Uncertain Interventions](./reading_group/sessions/2023_07_03/Castelletti_and_Peluso_2022.md)
