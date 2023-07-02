@@ -8,7 +8,6 @@ To approximate the posterior distribution over the space of DAGs and interventio
 
 The authors apply their methodology to genomic data collected under various drug treatments, revealing insights into gene dependencies and the effects of different drug therapies. They also discuss potential applications of their methodology in the study of brain networks and functional Magnetic Resonance Imaging (fMRI) activations.
 
-
 ## Contributions
 
 1. we build a new modelling framework where observational data are not strictly required, the excessive reliance on multiple tests is avoided, and unknown interventions are represented as indicator vector parameters, rather than auxiliary nodes that increase the graph dimension; 
