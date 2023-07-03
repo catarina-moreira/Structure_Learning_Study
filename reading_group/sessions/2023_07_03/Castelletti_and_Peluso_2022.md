@@ -90,3 +90,26 @@ The MCMC scheme allows us to approximate the posterior distribution, which repre
 The step-by-step details of the MCMC scheme provide a systematic approach to explore the space of possible configurations and estimate the posterior distribution [1].
 
 [1] Peluso, S., & Consonni, G. (2022). Bayesian Learning of Interventional Directed Acyclic Graphs. Journal of the American Statistical Association, 1-15.
+
+## Simulation 
+
+To assess the performance of our method, we construct various simulated settings by varying the number of variables $q \in \{20,40\}$, the sample size of each dataset X(k) with increasing values $n(k) \in \{10, 20, 50, 100, 200, 500\}$, for a number of interventions (datasets) $K = 4$.
+
+For comparison, the authors include 
+
+- the *Unkown Target Interventional Greedy Sparsest Permutation algorithm*
+- Algorithm 1 of He and Geng (2016)
+- Baseline node-wise regression approach (Han et al, 2016). 
+- include the *Greedy Interventional Equivalence Search* method from Hauser and Buhlmann (2012) implemented using the extended Bayesian Information Criteria (EBIC, Foygel and Drton, 2010). 
+  
+## Results
+
+In the simulation studies, the MCMC scheme showed a tendency of better recovery of the true graphical structure as the amount of available data increased. Overall, the Bayesian method (Bayes) outperformed the benchmark methods in terms of target and structure learning, except for a specific scenario with small sample sizes where a benchmark method performed better when the true targets were known [1].
+
+The real-data analysis focused on protein signaling data, where measurements of phosphorylated proteins and phospholipids were collected after stimulatory cues and inhibitory interventions. The Bayesian method was applied to analyze the data and estimate the posterior probabilities of intervention for different genes under drug treatments. The results showed that only a few genes exhibited high posterior probabilities of intervention under certain treatments, indicating their potential association with the interventions [5].
+
+The results demonstrate the effectiveness of the MCMC scheme and the Bayesian method in learning network structures and identifying intervention targets, both in simulated scenarios and real-world data analysis [1][5].
+
+[1] Peluso, S., & Consonni, G. (2022). Bayesian Learning of Interventional Directed Acyclic Graphs. Journal of the American Statistical Association, 1-15. 
+
+[5] Castelletti, F., & Peluso, S. (2022). Network Structure Learning Under Uncertain Interventions. Journal of the American Statistical Association, 1-12.
