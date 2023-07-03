@@ -1,5 +1,7 @@
 # Castelletti and Peluso (2022). Network Structure Learning Under Uncertain Interventions
 
+ [Paper Source Code (in R)](https://github.com/FedeCastelletti/bayes_learning_networks_interventional)
+
 ## Summary
 
 This paper presents a Bayesian statistical methodology for learning the dependence structure and intervention targets in a network of variables. The method utilizes a Directed Acyclic Graph (DAG) model and a DAG-Wishart prior on the DAG parameters. It also incorporates variable selection priors to express uncertainty on the intervention targets. The authors provide theoretical results on the identification of intervention targets and the consistency of the graph structure.
@@ -24,7 +26,7 @@ The authors apply their methodology to genomic data collected under various drug
 
 ### Choice of Priors
 
-#### Wishart Distribution
+#### Prior on DAG: Wishart Distribution
 The prior chosen to estimate the DAG follows a **Wishart distribution** with a hyperparameter $U$ and shape hyperparameter $a_D$.
 
 Let $X$ be a $p \times p$ symmetric matrix of random variables that is positive semi-definite. Let $V$ be a (fixed) symmetric positive definite matrix of size $p \times p$.
@@ -46,8 +48,45 @@ suggesting that a reasonable choice for $V$ would be $n^{-1} \Sigma_0^{-1}$, whe
 
 ![Inverse Wishart distribution](./reading_group/../imgs/inv_wishart_distr.png)
 
-#### Beta Distribution
+#### Prior on DAG Parameter $\theta$: Inverse Gamma Distribution
+
+Consider now the intervanetional parameters $\{ \Phi^{(k)}\}^K_{k=1}$, where each $\phi^{(k)}_j$ corresponds to an unconditional variance in a postintervention distribution where each node $j \in I_k$ has no parents, we can set
+
+$$\phi^{(k)}_j \approx I-Ga(a^{(k)}_j, b^{(k)}_j),$$
+
+independently, where $a^{(k)}_j = (a-q + 1)/2$ and $b^{(k)}_j = g/2$. 
+
+The prior on the collection of interventional parameters is therefore $p(\Phi^{(1)}, ..., \Phi^{(K)}) = \prod_{k=1}^K \prod_{j \in I_k} p(\Phi^{(k)}_j)$, leading to the conditional prior on $\theta$ of the form
+
+![Equation 8](./reading_group/../imgs/equation_8.png)
+
+
+#### Prior on Targets $l_1, ..., l_k$: Beta Distribution
 
 The prior on the collection of interventional parameters is assigned as $p(h_k | \pi_k)$, where $h_k$ represents the indicator vector for the k-th intervention target and π_k follows a Beta distribution with hyperparameters $a_k$ and $b_k$.
 
-The choice of $a_D = (a_{D1}, ..., a_{Dq})$ is made such that $a_Dj = (a - q + 1)/2 and b_Dj = g/2$, where a and g are elicited parameters.
+## MCMC Scheme and Posterior Inference
+
+The proposed MCMC scheme for posterior inference on Directed Acyclic Graphs (DAGs) and intervention targets works as follows:
+
+1. Initialize the MCMC algorithm by randomly selecting a DAG structure and intervention targets.
+
+2. Generate a new proposal DAG structure by making local modifications to the current structure. This can involve adding or removing edges between nodes in the DAG.
+
+3. Update the intervention targets by randomly selecting a subset of nodes in the DAG to be targeted by interventions.
+
+4. Evaluate the acceptance probability for the proposed DAG structure and intervention targets. This is done by comparing the likelihood of the data under the proposed configuration with the likelihood under the current configuration.
+
+5. Accept or reject the proposed configuration based on the acceptance probability. If the proposed configuration is accepted, update the current configuration to the proposed one. Otherwise, keep the current configuration unchanged.
+
+6. Repeat steps 2-5 for a large number of iterations to explore the space of possible DAG structures and intervention targets.
+
+7. After the MCMC iterations, obtain samples from the posterior distribution by retaining a subset of the configurations visited during the iterations. These samples represent our uncertainty about the true DAG structure and intervention targets.
+
+8. Analyze the samples to make inferences about the relationships between variables and the effects of interventions. This can involve calculating summary statistics, such as means or probabilities, based on the samples.
+
+The MCMC scheme allows us to approximate the posterior distribution, which represents our uncertainty about the true DAG structure and intervention targets. By sampling from this distribution, we can gain insights into the underlying relationships and make predictions based on the statistical model.
+
+The step-by-step details of the MCMC scheme provide a systematic approach to explore the space of possible configurations and estimate the posterior distribution [1].
+
+[1] Peluso, S., & Consonni, G. (2022). Bayesian Learning of Interventional Directed Acyclic Graphs. Journal of the American Statistical Association, 1-15.
