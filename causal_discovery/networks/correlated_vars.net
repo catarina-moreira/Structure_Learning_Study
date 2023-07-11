@@ -1,0 +1,109 @@
+net
+{
+	propagationenginegenerator1791944048146838126L = "edu.ucla.belief.approx.BeliefPropagationSettings@74246f10";
+	huginenginegenerator3061656038650325130L = "edu.ucla.belief.inference.JoinTreeSettings@39743e54";
+	recoveryenginegenerator6944530267470113528l = "edu.ucla.util.SettingsImpl@2c9630e1";
+	node_size = (130 55);
+}
+
+node X4
+{
+	states = ("true" "false" );
+	position = (129 -399);
+	diagnosistype = "AUXILIARY";
+	DSLxSUBMODEL = "Root Submodel";
+	ismapvariable = "false";
+	ID = "variable3";
+	label = "X4";
+	excludepolicy = "include whole CPT";
+}
+node X1
+{
+	states = ("true" "false" );
+	position = (208 -28);
+	diagnosistype = "AUXILIARY";
+	DSLxSUBMODEL = "Root Submodel";
+	ismapvariable = "false";
+	ID = "variable0";
+	label = "X1";
+	excludepolicy = "include whole CPT";
+}
+node X5
+{
+	states = ("true" "false" );
+	position = (493 -70);
+	diagnosistype = "AUXILIARY";
+	DSLxSUBMODEL = "Root Submodel";
+	ismapvariable = "false";
+	ID = "variable4";
+	label = "X5";
+	excludepolicy = "include whole CPT";
+}
+node X2
+{
+	states = ("true" "false" );
+	position = (477 -325);
+	diagnosistype = "AUXILIARY";
+	DSLxSUBMODEL = "Root Submodel";
+	ismapvariable = "false";
+	ID = "variable1";
+	label = "X2";
+	excludepolicy = "include whole CPT";
+}
+node X3
+{
+	states = ("true" "false" );
+	position = (3 -202);
+	diagnosistype = "AUXILIARY";
+	DSLxSUBMODEL = "Root Submodel";
+	ismapvariable = "false";
+	ID = "variable2";
+	label = "X3";
+	excludepolicy = "include whole CPT";
+}
+potential ( X4 | X1 X3 X2 X5 )
+{
+	data = (((((	1.0	0.0	)
+		(	0.0	1.0	))
+		((	1.0	0.0	)
+		(	0.0	1.0	)))
+		(((	0.9	0.1	)
+		(	1.0	0.0	))
+		((	0.0	1.0	)
+		(	0.9	0.1	))))
+		((((	0.0	1.0	)
+		(	1.0	0.0	))
+		((	0.0	1.0	)
+		(	0.1	0.9	)))
+		(((	1.0	0.0	)
+		(	0.9	0.1	))
+		((	0.9	0.1	)
+		(	0.0	1.0	)))));
+}
+potential ( X1 | )
+{
+	data = (	0.7	0.3	);
+}
+potential ( X5 | X1 X3 )
+{
+	data = (((	0.7	0.3	)
+		(	0.1	0.9	))
+		((	0.2	0.8	)
+		(	1.0	0.0	)));
+}
+potential ( X2 | X1 X5 X3 )
+{
+	data = ((((	1.0	0.0	)
+		(	0.0	1.0	))
+		((	1.0	0.0	)
+		(	0.9	0.1	)))
+		(((	1.0	0.0	)
+		(	0.1	0.9	))
+		((	1.0	0.0	)
+		(	0.0	1.0	))));
+}
+potential ( X3 | X1 )
+{
+	data = ((	0.9	0.1	)
+		(	0.1	0.9	));
+}
