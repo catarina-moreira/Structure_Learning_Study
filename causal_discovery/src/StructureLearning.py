@@ -12,6 +12,8 @@ class StructureLearningAlgorithm(ABC):
     def __init__(self):
         self.graph = nx.classes.graph.Graph()
         self.dag = nx.DiGraph()
+        self.debug_dag = {}
+        self.debug_graph = {}
 
     @abstractmethod
     def fit(self, data):
