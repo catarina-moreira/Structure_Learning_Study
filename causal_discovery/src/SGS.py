@@ -50,10 +50,13 @@ class SGS(StructureLearningAlgorithm):
                     if independent:
                         if self.graph.has_edge(node1, node2):
                             self.graph.remove_edge(node1, node2)
+                            
+        self.debug.append(self.graph.copy())
         return self
 
     def v_structure_phase(self, data : pd.DataFrame, verbose=False ):
         
+        self.debug_dag["v-structure_phase"] = list()
         [print("Entered v-structure phase") if verbose else None]
         
         [self.dag.add_node(node) for node in  self.graph.nodes()]
@@ -74,16 +77,21 @@ class SGS(StructureLearningAlgorithm):
                     
                     if not self.dag.has_edge(X, Y):
                         self.dag.add_edge(X, Y)
+                        self.debug_dag["v-structure_phase"].append(self.dag.copy()) 
                     
                     if not self.graph.has_edge(Z, Y):
                         self.graph.add_edge(Z, Y, arrowhead='v-struct')
                     
                     if not self.dag.has_edge(Z, Y):
                         self.dag.add_edge( Z, Y)
+                        self.debug_dag["v-structure_phase"].append(self.dag.copy()) 
+        
+        self.debug_dag["v-structure_phase"].append(self.dag.copy())     
         return self
 
     def orientation_phase(self, verbose=False ):
-    
+        
+        
         while True:
             
             change = False
@@ -105,6 +113,7 @@ class SGS(StructureLearningAlgorithm):
                     if 'arrowhead' in self.graph[node1][node3] and self.graph[node1][node3]['arrowhead'] == 'v-struct':
                         self.graph.add_edge(node1, node2, arrowhead='v-struct')
                         self.dag.add_edge(node1, node2)
+                        self.debug_dag["v-structure_phase"].append(self.dag.copy()) 
                         change = True    
                         break
                     
@@ -119,12 +128,15 @@ class SGS(StructureLearningAlgorithm):
                     if 'arrowhead' in self.graph[node2][node3] and self.graph[node2][node3]['arrowhead'] == 'v-struct':
                         self.graph.add_edge(node2, node1, arrowhead='v-struct')
                         self.dag.add_edge(node2, node1)
+                        self.debug_dag["v-structure_phase"].append(self.dag.copy()) 
                         change = True
                         break
                     
             # convergence reached
             if not change:
                 break
+            
+        self.debug_dag["v-structure_phase"].append(self.dag.copy()) 
         return self
 
     def get_structure(self):
