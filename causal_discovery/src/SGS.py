@@ -30,6 +30,9 @@ class SGS(StructureLearningAlgorithm):
     
     def skeleton_phase(self, data : pd.DataFrame, verbose=False ):
         
+        [self.dag.add_node(node) for node in  self.graph.nodes()]
+        self.init_debug( "skeleton_phase" )
+        
         #For each pair of variables X and Y in the graph
         for node1 in self.graph.nodes:
             for node2 in self.graph.nodes:
@@ -50,16 +53,15 @@ class SGS(StructureLearningAlgorithm):
                     if independent:
                         if self.graph.has_edge(node1, node2):
                             self.graph.remove_edge(node1, node2)
-                            
-        self.debug.append(self.graph.copy())
+                            self.debug_graph["skeleton_phase"].append(self.graph.copy())
+    
         return self
 
     def v_structure_phase(self, data : pd.DataFrame, verbose=False ):
         
-        self.debug_dag["v-structure_phase"] = list()
         [print("Entered v-structure phase") if verbose else None]
         
-        [self.dag.add_node(node) for node in  self.graph.nodes()]
+        self.init_debug( "v-structure_phase" )
 
         # Identify all triples (X, Y, Z) that form a V-structure X -> Y <- Z
         for X in self.graph.nodes():
@@ -74,6 +76,7 @@ class SGS(StructureLearningAlgorithm):
                     
                     if not self.graph.has_edge(X, Y):
                         self.graph.add_edge(X, Y, arrowhead='v-struct')
+                        self.debug_graph["v-structure_phase"].append(self.graph.copy())
                     
                     if not self.dag.has_edge(X, Y):
                         self.dag.add_edge(X, Y)
@@ -81,17 +84,16 @@ class SGS(StructureLearningAlgorithm):
                     
                     if not self.graph.has_edge(Z, Y):
                         self.graph.add_edge(Z, Y, arrowhead='v-struct')
+                        self.debug_graph["v-structure_phase"].append(self.graph.copy())
                     
                     if not self.dag.has_edge(Z, Y):
                         self.dag.add_edge( Z, Y)
-                        self.debug_dag["v-structure_phase"].append(self.dag.copy()) 
-        
-        self.debug_dag["v-structure_phase"].append(self.dag.copy())     
+                        self.debug_dag["v-structure_phase"].append(self.dag.copy())     
         return self
 
     def orientation_phase(self, verbose=False ):
         
-        
+        self.init_debug( "orientation_phase" )
         while True:
             
             change = False
@@ -112,8 +114,9 @@ class SGS(StructureLearningAlgorithm):
                     # then add an edge node1 -> node2
                     if 'arrowhead' in self.graph[node1][node3] and self.graph[node1][node3]['arrowhead'] == 'v-struct':
                         self.graph.add_edge(node1, node2, arrowhead='v-struct')
+                        self.debug_graph["orientation_phase"].append(self.graph.copy())
                         self.dag.add_edge(node1, node2)
-                        self.debug_dag["v-structure_phase"].append(self.dag.copy()) 
+                        self.debug_dag["orientation_phase"].append(self.dag.copy()) 
                         change = True    
                         break
                     
@@ -127,17 +130,31 @@ class SGS(StructureLearningAlgorithm):
                     
                     if 'arrowhead' in self.graph[node2][node3] and self.graph[node2][node3]['arrowhead'] == 'v-struct':
                         self.graph.add_edge(node2, node1, arrowhead='v-struct')
+                        self.debug_graph["orientation_phase"].append(self.graph.copy())
                         self.dag.add_edge(node2, node1)
-                        self.debug_dag["v-structure_phase"].append(self.dag.copy()) 
+                        self.debug_dag["orientation_phase"].append(self.dag.copy()) 
                         change = True
                         break
                     
             # convergence reached
             if not change:
                 break
-            
-        self.debug_dag["v-structure_phase"].append(self.dag.copy()) 
+    
         return self
 
     def get_structure(self):
         return self.dag
+    
+    def get_debug_dag(self):
+        return self.debug_dag
+    
+    def get_debug_graph(self):
+        return self.debug_graph
+    
+    def init_debug(self, phase):
+        self.debug_graph[phase] = list()
+        self.debug_graph[phase].append(self.graph.copy())
+        
+        self.debug_dag[phase] = list()
+        self.debug_dag[phase].append(self.dag.copy())
+        

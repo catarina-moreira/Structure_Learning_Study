@@ -40,4 +40,12 @@ class StructureLearningAlgorithm(ABC):
             The learned structure.
         """
         pass
+    
+    @abstractmethod
+    def get_debug_dag(self):
+        pass
+    
+    @abstractmethod
+    def get_debug_graph(self):
+        pass
 
