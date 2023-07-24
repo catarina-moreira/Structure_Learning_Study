@@ -1,0 +1,35 @@
+import pandas as pd
+import networkx as nx
+from pgmpy.models import BayesianModel
+from pgmpy.estimators import MaximumLikelihoodEstimator, BdeuScore, K2Score, BicScore
+
+def compute_posterior(G, data):
+    # Convert the NetworkX graph to a pgmpy BayesianModel
+    model = BayesianModel(G.edges())
+
+    # Fit the model to the data using maximum likelihood estimation
+    model.fit(data, estimator=MaximumLikelihoodEstimator)
+
+    # Compute the BIC score of the model
+    bic = BicScore(data)
+    score = bic.score(model)
+
+    # Convert the BIC score to a posterior probability
+    posterior = np.exp(score)
+
+    return posterior
+    
+    
+    
+Cuonterfactuals tell what you need to get there, but not how to get there
+
+issues 111 112 113
+images dos artigos
+apontadores para o editorial
+
+https://www.sciencedirect.com/journal/computers-and-graphics
+https://www.sciencedirect.com/journal/computers-and-graphics/vol/112/suppl/C
+
+13187
+
+dsj+f+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
