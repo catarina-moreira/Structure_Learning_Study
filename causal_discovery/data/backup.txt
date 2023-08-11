@@ -21,15 +21,3 @@ def compute_posterior(G, data):
     
     
     
-Cuonterfactuals tell what you need to get there, but not how to get there
-
-issues 111 112 113
-images dos artigos
-apontadores para o editorial
-
-https://www.sciencedirect.com/journal/computers-and-graphics
-https://www.sciencedirect.com/journal/computers-and-graphics/vol/112/suppl/C
-
-13187
-
-dsj+f+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
