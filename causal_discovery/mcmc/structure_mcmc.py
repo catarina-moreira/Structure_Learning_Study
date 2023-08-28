@@ -98,12 +98,12 @@ class StructureMCMC( MCMC_abstract ):
                 0 and 1, the proposed move is accepted; otherwise, it's rejected.
         """
         # in structure MCMC, a proposal is only symmetric if an edge reverse operation takes place
-        if operation == "reverse_edge":
+        #if operation == "reverse_edge":
             # A(G, G') = min(1, P(G' | D) / P(G | D))
-            A = self.compute_symmetric_acceptance_ratio(score_G_current, score_G_proposed)
-        else:
+        #    A = self.compute_symmetric_acceptance_ratio(score_G_current, score_G_proposed)
+        #else:
             #  A(G, G') = min(1, [P(G' | D) * Q(G | G')] / [P(G | D) * Q(G' | G)])
-            A =  self.compute_non_symmetric_acceptance_ratio(G_current, score_G_current, G_proposed, score_G_proposed, operation)
+        A =  self.compute_non_symmetric_acceptance_ratio(G_current, score_G_current, G_proposed, score_G_proposed, operation)
         return A
 
     def compute_log_acceptance_ratio(self, G_current, score_G_current, G_proposed, score_G_proposed, operation):
