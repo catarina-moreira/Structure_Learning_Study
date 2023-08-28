@@ -4,8 +4,9 @@ import networkx as nx
 
 from scipy.special import gammaln
 
+from abc import ABC, abstractmethod
 
-class Score:
+class Score(ABC):
     """
     Base class for scoring Bayesian networks. This class provides basic functionality 
     for storing and accessing data, graph structure, and various graph attributes.
@@ -25,7 +26,6 @@ class Score:
     - getSampleSize(): Returns the number of samples in the dataset.
     """
     
-    
     def __init__(self, df: pd.DataFrame, G : nx.DiGraph):
         """
         Initializes the Score class with a dataset and a graph structure.
@@ -39,6 +39,7 @@ class Score:
         self.nodes = list(G.nodes())
         self.n, _ = self.df.shape
     
+    @abstractmethod
     def compute(self):
         """
         Placeholder method for computing the score. Must be implemented in derived classes.
@@ -83,7 +84,9 @@ class Score:
         - int: The number of samples.
         """
         return self.n
-    
+
+# LOG MARGINAL LIKELIHOOD
+#################################################################################
 class LogMarginalLikelihood(Score):
     """
     Computes the log marginal likelihood of a Gaussian Bayesian network given 
@@ -181,7 +184,10 @@ class LogMarginalLikelihood(Score):
             total_log_ml += log_ml_node
         
         return total_log_ml, parameters
-    
+
+
+# MARGINAL LIKELIHOOD
+#################################################################################
 class MarginalLikelihood(Score):
     """
     Computes the marginal likelihood of a Gaussian Bayesian network given 
@@ -208,24 +214,32 @@ class MarginalLikelihood(Score):
         score, params = lorMargScore.compute()
         return np.exp(score), params
 
+# LOG LIKELIHOOD
+#################################################################################
 class LogLikelihood(Score):
     pass
 
+# LIKELIHOOD
+#################################################################################
 class Likelihood(Score):
     pass
 
+# BGESCORE
+#################################################################################
 class BGeScore(Score):
     pass
 
+# BDEU SCORE
+#################################################################################
 class BDeuScore(Score):
     pass
 
+# BIC SCORE
+#################################################################################
 class BICScore(Score):
     pass
 
+# AIC SCORE
+#################################################################################
 class AICScore(Score):
-    pass
-
-
-def BGeScore(Score):
     pass

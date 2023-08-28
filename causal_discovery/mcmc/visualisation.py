@@ -7,79 +7,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set()
 
-def plot_graph_distribution( freq_dict, figsize = (15,7) ):
-    
-    max_labels = []
-    
-    # assume freq_dict is the dictionary with the frequencies
-    labels = list(freq_dict.keys())
-    values = list(freq_dict.values())
-
-    # find the maxumum frequency and get the label
-    max_freq = max(values)
-    max_label = labels[values.index(max_freq)]
-    
-    plt.figure(figsize=figsize)
-    
-    # create a bar plot
-    plt.bar(labels, values)
-    
-    # if there are other bars with the same frequency, change their color
-    for i in range(len(labels)):
-        if values[i] == max_freq:
-            plt.bar(labels[i], values[i], color='red')
-            max_labels.append(labels[i])
-
-    # set the title and axis labels
-    plt.title("Graph Distribution. MAX = " + str(max_label) + " with prob " + str(max_freq))
-    plt.xlabel("Graph")
-    plt.ylabel("Probability")
-    
-    # rotate x labels
-    plt.xticks(rotation=90)
-
-    # no grid
-    plt.grid(False)
-
-    # show the plot
-    plt.tight_layout()
-    plt.show()
-    
-    return max_labels, max_freq
-    
-
-def plot_edges_trace(graphs, figsize=(15, 5)):
-    # Compute the number of edges in each graph
-    num_edges = [G.number_of_edges() for G in graphs]
-
-    plt.figure(figsize=figsize)
-    plt.plot(num_edges, linewidth=0.5 )
-
-    plt.title("Trace plot of the number of edges")
-    plt.xlabel("Step")
-    plt.ylabel("Number of edges")
-    plt.grid(False)
-    
-    plt.tight_layout()
-    plt.show()
-    
-    
-def plot_trace(posteriors, burnit, figsize=(15, 5)):
-    fig, ax = plt.subplots()
-    plt.figure(figsize=figsize)
-    
-    data = posteriors["marginal_likelihood"]
-    ax.plot(data[burnit:])
-
-    #for i in posteriors["accepted_iterations"]:
-    #    # plot the accepted iterations in red
-    #    ax.plot(i, posteriors["marginal_likelihood"][i], "ro")
-        
-    ax.set_title("Trace plot of the log marginal likelihood")
-    ax.set_xlabel("Step")
-    ax.set_ylabel("Log marginal likelihood")
-    plt.tight_layout()
-    plt.show()
 
 
 def plot_graph(G, title="Graph", node_size = 2000, figsize=(4,4)):
@@ -91,6 +18,7 @@ def plot_graph(G, title="Graph", node_size = 2000, figsize=(4,4)):
     ax.set_title(title)
     plt.axis("off")
     plt.show()
+
 
 def plot_graph_transition(G1, G2, iteration):
     operation = None
@@ -145,3 +73,34 @@ def plot_histogram(samples, title = "Histogram and Density Plot", xlabel = "x-ax
     plt.ylabel('Frequency')
     plt.grid(True, which='both', linestyle='--', linewidth=0.5)
     plt.show()
+    
+def log_marginal_likelihood_plot( all_dags : dict):
+    
+    # Extracting keys and scores
+    keys = list(all_dags.keys())
+    scores = [all_dags[key]["log_score"] for key in keys]
+
+    # Plotting
+    plt.figure(figsize=(10,6))
+    plt.bar(keys, scores, color='skyblue')
+    plt.xlabel('Graph Index')
+    plt.ylabel('marginal loglikelihood scaled and normalised')
+    plt.title('Scores of different DAGs')
+    plt.grid(False)
+    plt.show()
+
+
+def marginal_likelihood_plot( all_dags : dict, figsize=(10,6)):
+    # Extracting keys and scores
+    keys = list(all_dags_2.keys())
+    scores = [all_dags_2[key]["score_normalised"] for key in keys]
+
+    # Plotting
+    plt.figure(figsize=figsize)
+    plt.bar(keys, scores, color='skyblue')
+    plt.xlabel('Graph Index')
+    plt.ylabel('marginal likelihood scaled & normalised')
+    plt.title('Scores of different DAGs')
+    plt.grid(False)
+    plt.show()
+    
