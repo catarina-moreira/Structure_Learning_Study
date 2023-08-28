@@ -6,8 +6,8 @@ from causal_discovery.SGS import SGS
 class MCMC_abstract(ABC):
     
     # the class constructor takes a dataset and a number of iterations and optionally a graph
-    def __init__(self, df, iterations, G_initial = None):
-        self.df = df
+    def __init__(self, data, iterations, G_initial = None):
+        self.data = data
         self.iterations = iterations
         
         if G_initial is None:

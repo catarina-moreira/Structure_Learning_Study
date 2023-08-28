@@ -92,8 +92,8 @@ def log_marginal_likelihood_plot( all_dags : dict):
 
 def marginal_likelihood_plot( all_dags : dict, figsize=(10,6)):
     # Extracting keys and scores
-    keys = list(all_dags_2.keys())
-    scores = [all_dags_2[key]["score_normalised"] for key in keys]
+    keys = list(all_dags.keys())
+    scores = [all_dags[key]["score_normalised"] for key in keys]
 
     # Plotting
     plt.figure(figsize=figsize)

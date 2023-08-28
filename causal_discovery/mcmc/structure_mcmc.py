@@ -32,35 +32,35 @@ class StructureMCMC( MCMC_abstract ):
         accept_indx = []
         
         candidate_scores = []
-        candidate_graphs = [self.G]
+        candidate_graphs = [self.G_initial]
         
         # Use initialized graph. If the user did not provide a graph, PC Algo will take place and will generate a graph
-        G_current = self.G.copy()
+        G_current = self.G_initial.copy()
         score_G_current, params_curr = self.compute_score_function( G_current )
         candidate_scores = [score_G_current]
         
-        params = {}
-        params[ iter ] = params_curr
+        candidate_params = {}
+        candidate_params[ iter ] = params_curr
 
         # start the MCMC loop
-        for i in range(iterations):
+        for i in range(self.iterations):
             
             # Propose a new graph by applying an operation to the current graph: add an edge, delete an edge, or reverse an edge
-            G_proposed, operation = self.propose_new_graph(G_current)
+            G_proposed, operation = propose_new_graph( G_current )
             
             # check if G_proposed is a directed acyclic graph, if not, reject it
-            if not nx.is_directed_acyclic_graph(G_proposed):
+            if not nx.is_directed_acyclic_graph( G_proposed ):
                 continue
             
             # if the proposed graph is a DAG, compute the posterior
-            posterior_G_proposed, params = self.compute_score_function( )
+            score_G_proposed, params = self.compute_score_function( G_proposed )
             
             # Calculate the acceptance probability
             if "Log" in self.score_function:
-                A = self.compute_log_acceptance_ratio(G_current, score_G_current, G_proposed, posterior_G_proposed, operation, is_proposal_symmetric)
+                A = self.compute_log_acceptance_ratio(G_current, score_G_current, G_proposed, score_G_proposed, operation)
                 u = np.log(np.random.uniform(0, 1)) # Draw a random number in log space
             else:
-                A = self.compute_acceptance_ratio(G_current, score_G_current, G_proposed, posterior_G_proposed, operation, is_proposal_symmetric)
+                A = self.compute_acceptance_ratio(G_current, score_G_current, G_proposed, score_G_proposed, operation)
                 u = np.random.uniform(0, 1) # Generate a random number
                 
             # metropolis condition    
@@ -70,19 +70,19 @@ class StructureMCMC( MCMC_abstract ):
                     
                 # update the current graph and its posterior
                 G_current = G_proposed.copy()
-                score_G_current = posterior_G_proposed
+                score_G_current = score_G_proposed
             
             if random_restarts:
                 if i % restart_freq == 0: # force the chain to jump
-                    G_current = generate_random_dag(nodes)  
-                    score_G_current, params = self.compute_score_function( data, G_current, score_type = score_function )
+                    G_current = generate_random_dag( self.nodes )   # generate a random graph with 50% prob of adding an edge
+                    score_G_current, params = self.compute_score_function( G_current )
 
             candidate_scores.append(score_G_current)
             candidate_graphs.append(G_current)
             candidate_params[iter] = params
             i = i + 1        
             
-        return {"scores" : candidate_scores, "acceptance_rate" : accept / iterations, "accepted_iterations" : accept_indx, "graphs" : candidate_graphs, "params" : candidate_params} 
+        return {"scores" : candidate_scores, "acceptance_rate" : accept / self.iterations, "accepted_iterations" : accept_indx, "graphs" : candidate_graphs, "params" : candidate_params} 
 
     
     def compute_acceptance_ratio(self, G_current, score_G_current, G_proposed, score_G_proposed, operation):
@@ -100,10 +100,10 @@ class StructureMCMC( MCMC_abstract ):
         # in structure MCMC, a proposal is only symmetric if an edge reverse operation takes place
         if operation == "reverse_edge":
             # A(G, G') = min(1, P(G' | D) / P(G | D))
-            A = compute_symmetric_acceptance_ratio(score_G_current, G_proposed, score_G_proposed)
+            A = self.compute_symmetric_acceptance_ratio(score_G_current, score_G_proposed)
         else:
             #  A(G, G') = min(1, [P(G' | D) * Q(G | G')] / [P(G | D) * Q(G' | G)])
-            A =  compute_non_symmetric_acceptance_ratio(G_current, posterior_G_current, G_proposed, posterior_G_proposed, operation)
+            A =  self.compute_non_symmetric_acceptance_ratio(G_current, score_G_current, G_proposed, score_G_proposed, operation)
         return A
 
     def compute_log_acceptance_ratio(self, G_current, score_G_current, G_proposed, score_G_proposed, operation):
@@ -122,13 +122,11 @@ class StructureMCMC( MCMC_abstract ):
         # in structure MCMC, a proposal is only symmetric if an edge reverse operation takes place
         if operation == "reverse_edge":
             # A(G, G') = min(0, logP(G' | D) / P(G | D))
-            A = compute_log_symmetric_acceptance_ratio(score_G_current, G_proposed, score_G_proposed)
+            A = self.compute_log_symmetric_acceptance_ratio(score_G_current, score_G_proposed)
         else:
             #  A(G, G') = min(0, log[P(G' | D) * Q(G | G')] / [P(G | D) * Q(G' | G)])
-            A =  compute_non_log_symmetric_acceptance_ratio(G_current, log_marginal_likelihood_G_current, G_proposed, log_marginal_likelihood_G_proposed, operation)
+            A =  self.compute_non_log_symmetric_acceptance_ratio(G_current, score_G_current, G_proposed, score_G_proposed, operation)
         return A
-
-    
 
     # PROPOSAL DISTRIBUTIONS AND ACCEPTANCE RATIOS
     #######################################################################
@@ -197,8 +195,8 @@ class StructureMCMC( MCMC_abstract ):
         the non-symmetry in the proposal distribution.
         """
         # Compute the proposal distributions at the current and proposed graphs
-        Q_G_proposed_given_G = Q_G_to_G_prime(G_current, operation_G_to_G_prime)
-        Q_G_given_G_proposed = Q_G_prime_to_G( G_proposed, operation_G_to_G_prime )
+        Q_G_proposed_given_G = self.Q_G_to_G_prime(G_current, operation_G_to_G_prime)
+        Q_G_given_G_proposed = self.Q_G_prime_to_G( G_proposed, operation_G_to_G_prime )
 
         return min(1, (score_G_proposed * Q_G_given_G_proposed) / (score_G_current * Q_G_proposed_given_G))
 
@@ -212,8 +210,8 @@ class StructureMCMC( MCMC_abstract ):
         graph structure `G'` through a specified operation. The acceptance ratio accounts for 
         the non-symmetry in the proposal distribution and operates in the log space for numerical stability.
         """
-        Q_G_proposed_given_G = Q_G_to_G_prime( G_current, operation_G_to_G_prime )
-        Q_G_given_G_proposed = Q_G_prime_to_G( G_proposed, operation_G_to_G_prime )
+        Q_G_proposed_given_G = self.Q_G_to_G_prime( G_current, operation_G_to_G_prime )
+        Q_G_given_G_proposed = self.Q_G_prime_to_G( G_proposed, operation_G_to_G_prime )
         
         log_numerator = score_G_proposed + np.log(Q_G_given_G_proposed)
         log_denominator = score_G_current + np.log(Q_G_proposed_given_G)
@@ -288,27 +286,27 @@ class StructureMCMC( MCMC_abstract ):
         - OverflowError: If the computation of the Marginal Likelihood results in a value too large to represent.
         """  
         
-        if score_type == "BIC":
+        if self.score_function == "BIC":
             score = BICScore(self.data, G)
             res, params = score.compute()
             return res, params
         
-        if score_type == "AIC":
+        if self.score_function == "AIC":
             score = AICScore(self.data, G)
             res, params = score.compute()
             return res, params
         
-        if score_type == "BGe":
+        if self.score_function == "BGe":
             score = BGeScore(self.data, G)
             res, params = score.compute()
             return res, params
         
-        if score_type == "Log_Marginal_Likelihood":
+        if self.score_function == "Log_Marginal_Likelihood":
             score = LogMarginalLikelihood(self.data, G)
             res, params = score.compute()
             return res, params
         
-        if score_type == "Marginal_Likelihood":
+        if self.score_function == "Marginal_Likelihood":
             try:
                 score = MarginalLikelihood(self.data, G)
                 res, params = score.compute()

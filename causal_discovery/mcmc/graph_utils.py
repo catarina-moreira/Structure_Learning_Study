@@ -295,3 +295,27 @@ def generate_all_dags(df: pd.DataFrame):
     print(f"total_score_normalised = {np.round(total_score_normalised, 6)}")
         
     return all_dags, total_score
+
+def generate_graph_distribution(graph_list : list, data : pd.DataFrame):
+    graph_to_id = {}
+    id_to_freq = {}
+    id_to_graph = {}
+    id_to_score = {}
+    current_id = 0
+
+    for graph in graph_list:
+        score = LogMarginalLikelihood( data, graph)
+        graph_hash = hash(tuple(sorted(graph.edges())))
+        
+        # If this graph has not been seen before, assign a new ID
+        if graph_hash not in graph_to_id:
+            graph_to_id[graph_hash] = f"G_{current_id}"
+            id_to_freq[f"G_{current_id}"] = 1
+            id_to_graph[f"G_{current_id}"] = graph
+            id_to_score[f"G_{current_id}"] = score.compute()
+            current_id += 1
+        else:
+            id_to_freq[graph_to_id[graph_hash]] += 1
+            
+    return id_to_freq, id_to_graph, id_to_score
+
