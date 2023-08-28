@@ -6,18 +6,19 @@ from causal_discovery.SGS import SGS
 class MCMC_abstract(ABC):
     
     # the class constructor takes a dataset and a number of iterations and optionally a graph
-    def __init__(self, df, iterations, G = None):
+    def __init__(self, df, iterations, G_initial = None):
         self.df = df
         self.iterations = iterations
         
-        if G is None:
+        if G_initial is None:
             # if no graph is provided, initialize a  graph using the PC Algorithm
             SGS_model = SGS()
             SGS_model.fit(data)
-            self.G = SGS_model.get_structure()
+            self.G_initial = SGS_model.get_structure()
         else:
-            # otherwise use the provided graph
-            self.G = G
+            self.G_initial = G_initial # otherwise use the provided graph
+            
+        self.nodes = list(G_initial.nodes())
     
     @abstractmethod
     def compute_log_acceptance_ratio(self, score_old, score_new):
@@ -28,16 +29,16 @@ class MCMC_abstract(ABC):
         pass
     
     @abstractmethod
-    def run_mcmc():
+    def run():
         pass  
     
     # the getGraph method returns the graph structure
-    def getGraph(self):
-        return self.G
+    def getInitialGraph(self):
+        return self.G_initial
 
     # the getNodes method returns the list of nodes present in the graph
     def getNodes(self):
-        return list(self.G.nodes())
+        return list(self.G_initial.nodes())
     
     # the getSampleSize method returns the number of samples in the dataset
     def getSampleSize(self):

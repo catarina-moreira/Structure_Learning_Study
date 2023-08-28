@@ -1,11 +1,11 @@
-from src.StructureLearning import StructureLearningAlgorithm
+from causal_discovery.StructureLearning import StructureLearningAlgorithm
 
 import networkx as nx
 import pandas as pd
 import numpy as np
 
-from src.util import generate_subsets, remove_vars_from_list
-from src.statistical_tests import test_conditional_independence
+from causal_discovery.util import generate_subsets, remove_vars_from_list
+from causal_discovery.statistical_tests import test_conditional_independence
 
 class SGS(StructureLearningAlgorithm):
     """
