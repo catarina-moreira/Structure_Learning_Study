@@ -9,9 +9,13 @@ from mcmc.graph_utils import total_possible_add_edges, total_possible_remove_edg
 from mcmc.scores import LogMarginalLikelihood, MarginalLikelihood, BGeScore, BICScore, AICScore
 
 
+
+
+
+
 # STRUCTURE MCMC
-##########################################
-def structured_MCMC(data : pd.DataFrame, initial_graph : nx.DiGraph, iterations : int, score_function : str,  random_restarts = False, restart_freq = 100, is_proposal_symmetric : bool = False):
+##########################################################################################################
+def run_mcmc(data : pd.DataFrame, initial_graph : nx.DiGraph, iterations : int, score_function : str,  random_restarts = False, restart_freq = 100, is_proposal_symmetric : bool = False):
     """
     Perform the structured Markov Chain Monte Carlo (MCMC) for Bayesian Network structure learning.
     
@@ -46,27 +50,23 @@ def structured_MCMC(data : pd.DataFrame, initial_graph : nx.DiGraph, iterations 
     `generate_random_dag`, and others in the environment.
     - The function is stochastic and may produce different results on different runs due to its inherent randomness.
     """
-    
+
     i = 0
-    HASH_TO_ID = {}
-    ACCEPT = 0
-    ACCEPT_INDX = []
+    accept = 0
+    accept_indx = []
 
     nodes = list(initial_graph.nodes())
     
-    posterior_candidates = []
-    graph_candidates = [initial_graph]
+    candidate_scores = []
+    candidate_graphs = [initial_graph]
     
     # Initialize the graph
     G_current = initial_graph  
-    posterior_G_current, params_curr = compute_score_function( data, G_current, score_type = score_function )
-    posterior_candidates = [posterior_G_current]
+    score_G_current, params_curr = compute_score_function( data, G_current, score_type = score_function )
+    candidate_scores = [score_G_current]
     
-    PARAMS = {}
-    PARAMS[ "G_0" ] = params_curr
-    
-    # initialize data structures with the initial graph and its posterior
-    ID_TO_GRAPH, HASH_TO_ID, ID_TO_FREQ, OPERATIONS, ID_TO_MARGINAL, COUNT = initialize_structures(G_current, posterior_G_current)
+    params = {}
+    params[ "G_0" ] = params_curr
 
     # start the MCMC loop
     for i in range(iterations):
@@ -83,32 +83,28 @@ def structured_MCMC(data : pd.DataFrame, initial_graph : nx.DiGraph, iterations 
         
         # Calculate the acceptance probability
         if "Log" in score_function:
-            A = compute_log_acceptance_ratio(G_current, posterior_G_current, G_proposed, posterior_G_proposed, operation, is_proposal_symmetric)
-            
+            A = compute_log_acceptance_ratio(G_current, score_G_current, G_proposed, posterior_G_proposed, operation, is_proposal_symmetric)
             u = np.log(np.random.uniform(0, 1)) # Draw a random number in log space
         else:
-            A = compute_acceptance_ratio(G_current, posterior_G_current, G_proposed, posterior_G_proposed, operation, is_proposal_symmetric)
-
+            A = compute_acceptance_ratio(G_current, score_G_current, G_proposed, posterior_G_proposed, operation, is_proposal_symmetric)
             u = np.random.uniform(0, 1) # Generate a random number
             
+        # metropolis condition    
         if u < A: 
-            ACCEPT = ACCEPT + 1
-            ACCEPT_INDX.append(i)
+            accept = accept + 1
+            accept_indx.append(i)
                 
             # update the current graph and its posterior
             G_current = G_proposed.copy()
-            posterior_G_current = posterior_G_proposed
-                
-            # add information to the data structures
-            ID_TO_GRAPH, HASH_TO_ID, ID_TO_FREQ, OPERATIONS, ID_TO_MARGINAL, COUNT = update_structures(G_current, posterior_G_current, operation, ID_TO_GRAPH, HASH_TO_ID, ID_TO_FREQ, OPERATIONS, ID_TO_MARGINAL, COUNT, posterior_candidates)
-
+            score_G_current = posterior_G_proposed
+        
         if random_restarts:
             if i % restart_freq == 0: # force the chain to jump
                 G_current = generate_random_dag(nodes)  
-                posterior_G_current, params = compute_score_function( data, G_current, score_type = score_function )
+                score_G_current, params = compute_score_function( data, G_current, score_type = score_function )
 
-        posterior_candidates.append(posterior_G_current)
-        graph_candidates.append(G_current)
+        candidate_scores.append(score_G_current)
+        candidate_graphs.append(G_current)
         PARAMS["G_" + str(i)] = params
         i = i + 1        
         
