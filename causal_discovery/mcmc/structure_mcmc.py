@@ -3,10 +3,10 @@ import numpy as np
 import networkx as nx
 import random
 
-from utils import initialize_structures, update_structures
-from graph_utils import total_possible_add_edges, total_possible_remove_edges, total_possible_reverse_edges, generate_random_dag, propose_new_graph
+from mcmc.utils import initialize_structures, update_structures
+from mcmc.graph_utils import total_possible_add_edges, total_possible_remove_edges, total_possible_reverse_edges, generate_random_dag, propose_new_graph
 
-from scores import LogMarginalLikelihood, MarginalLikelihood, BGeScore, BICScore, AICScore
+from mcmc.scores import LogMarginalLikelihood, MarginalLikelihood, BGeScore, BICScore, AICScore
 
 
 # STRUCTURE MCMC

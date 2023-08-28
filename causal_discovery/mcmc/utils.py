@@ -98,3 +98,19 @@ def add_noise(data, noise_level):
 def get_max_score_key(scores_dict):
     """Return the key corresponding to the maximum score."""
     return max(scores_dict, key=scores_dict.get)
+
+def generate_data(params, n_samples=1000 ):
+    
+    # Generate exogenous variables X
+    X2 = np.random.normal(0, params["sigma_x2"], n_samples)
+    X3 = np.random.normal(0, params["sigma_x3"], n_samples)
+    X4 = np.random.normal(0, params["sigma_x4"], n_samples)
+    
+    # Generate X1 based on the regression model
+    epsilon = np.random.normal(0, params["sigma_epsilon"], n_samples)
+    X1 = params["beta0"] + params["beta2"] * X2 + params["beta3"] * X3 + epsilon
+    
+    df = pd.DataFrame({'X1': X1, 'X2': X2, 'X3': X3})
+    
+    return df
+

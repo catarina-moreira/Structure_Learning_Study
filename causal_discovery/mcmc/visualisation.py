@@ -82,14 +82,15 @@ def plot_trace(posteriors, burnit, figsize=(15, 5)):
     plt.show()
 
 
-def plot_graph(G, title="Graph", node_size = 2000):
+def plot_graph(G, title="Graph", node_size = 2000, figsize=(4,4)):
+    
+    plt.figure(figsize=figsize)
     nx.draw(G, with_labels=True, arrowsize=20, node_size=node_size, node_color="skyblue", pos=nx.spring_layout(G))
     ax = plt.gca()
     ax.margins(0.20)
     ax.set_title(title)
     plt.axis("off")
     plt.show()
-    
 
 def plot_graph_transition(G1, G2, iteration):
     operation = None
@@ -134,5 +135,13 @@ def plot_graph_transition(G1, G2, iteration):
     
     return G_out
 
+def plot_histogram(samples, title = "Histogram and Density Plot", xlabel = "x-axis", figsize=(10,6)):
+    
+    plt.figure(figsize=figsize)
 
-
+    sns.histplot(samples, kde=True, bins=30, color='skyblue')
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel('Frequency')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    plt.show()

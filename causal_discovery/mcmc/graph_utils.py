@@ -6,7 +6,7 @@ import pandas as pd
 
 import itertools
 
-from scores import LogMarginalLikelihood
+from mcmc.scores import LogMarginalLikelihood
 
 def possible_edges_for_dag(G : nx.DiGraph):
     """
@@ -37,7 +37,7 @@ def possible_edges_for_dag(G : nx.DiGraph):
                     G.remove_edge(u, v)  # Remove the edge to continue checking other possibilities
     return possible_edges
 
-def possible_add_edges(G : nx.DiGraph ):
+def total_possible_add_edges(G : nx.DiGraph ):
     """
     Computes the number of edges that can be added to the graph without introducing a cycle.
 
