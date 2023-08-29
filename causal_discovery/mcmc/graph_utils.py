@@ -303,6 +303,7 @@ def generate_graph_distribution(graph_list : list, data : pd.DataFrame):
     id_to_score = {}
     current_id = 0
 
+    total_score = 0
     for graph in graph_list:
         score = LogMarginalLikelihood( data, graph)
         graph_hash = hash(tuple(sorted(graph.edges())))
@@ -313,9 +314,31 @@ def generate_graph_distribution(graph_list : list, data : pd.DataFrame):
             id_to_freq[f"G_{current_id}"] = 1
             id_to_graph[f"G_{current_id}"] = graph
             id_to_score[f"G_{current_id}"] = score.compute()
+            id_to_normalised_score = 
             current_id += 1
         else:
             id_to_freq[graph_to_id[graph_hash]] += 1
+            
+    # get the max score
+    min_score = min([ id_to_score[id] for id in id_to_score.keys() ])
+    max_score = max([ id_to_score[id] for id in id_to_score.keys() ])
+    
+    # since the marginal likelihood grows very fast, we need to normalise the scores
+    # we will subtract the max score from all scores and then divide by the total score
+    for id in all_dags.keys():
+        all_dags[id]["log_score"] = all_dags[id]["log_score"]  - max_score
+        all_dags[id]["score"] = np.exp( all_dags[id]["log_score"]  )
+        total_score = total_score + all_dags[id]["score"]
+    
+    # iterate of the dags and normalise the scores
+    for dag in all_dags.keys():
+        all_dags[dag]["score_normalised"] = np.round(all_dags[dag]["score"] / total_score, 6)
+        
+    # sanity check: check if the normalised score sums to 1
+    total_score_normalised = 0
+    for dag in all_dags.keys():
+        total_score_normalised = total_score_normalised + all_dags[dag]["score_normalised"]
+    print(f"total_score_normalised = {np.round(total_score_normalised, 6)}")
             
     return id_to_freq, id_to_graph, id_to_score
 
