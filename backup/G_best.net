@@ -1,0 +1,65 @@
+net
+{
+}
+
+node Dist_to_School
+{
+}
+
+node Parents_Education
+{
+}
+
+node Teachers_Expectations
+{
+}
+
+node Community_Belonging
+{
+}
+
+node Community_Involvement
+{
+}
+
+node Student_Confidence
+{
+}
+
+node Attendance_Rate
+{
+}
+
+node High_School_Compl
+{
+}
+
+potential ( Community_Belonging | Parents_Education Community_Involvement )
+{
+};
+
+potential ( Community_Involvement | Parents_Education Student_Confidence Attendance_Rate )
+{
+}
+
+potential ( Student_Confidence | Parents_Education Teachers_Expectations )
+{
+}
+
+potential ( Attendance_Rate | Dist_to_School Parents_Education Teachers_Expectations Student_Confidence )
+{
+}
+
+potential ( High_School_Compl | Parents_Education Teachers_Expectations Community_Involvement Student_Confidence Attendance_Rate )
+{
+}
+
+
+
+as interaction design
+we need to do more of this and the uestions will come with the XAI tech
+the modular approavh, when and there
+interaction dsign as a eway to engage with the system
+
+interaction design
+explainability
